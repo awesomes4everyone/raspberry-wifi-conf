@@ -32,13 +32,6 @@ function write_template_to_file(template_path, file_name, context, callback) {
     connection information
 \*****************************************************************************/
 module.exports = function() {
-    // Detect which wifi driver we should use, the rtl871xdrv or the nl80211
-    exec("iw list", function(error, stdout, stderr) {
-        if (stderr.match(/^nl80211 not found/)) {
-            config.wifi_driver_type = "rtl871xdrv";
-        }
-        // console.log("config.wifi_driver_type = " + config.wifi_driver_type);
-    });
 
     // Hack: this just assumes that the outbound interface will be "wlan0"
 
@@ -96,13 +89,15 @@ module.exports = function() {
     _reboot_wireless_network = function(wlan_iface, callback) {
         async.series([
             function down(next_step) {
-                exec("sudo ifdown " + wlan_iface, function(error, stdout, stderr) {
+                //TODO: throw error
+		exec("ifdown " + wlan_iface, function(error, stdout, stderr) {
                     if (!error) console.log("ifdown " + wlan_iface + " successful...");
                     next_step();
                 });
             },
             function up(next_step) {
-                exec("sudo ifup " + wlan_iface, function(error, stdout, stderr) {
+		//TODO: throw error
+                exec("ifup " + wlan_iface, function(error, stdout, stderr) {
                     if (!error) console.log("ifup " + wlan_iface + " successful...");
                     next_step();
                 });
@@ -220,7 +215,7 @@ module.exports = function() {
                 },
 
                 function restart_dhcp_service(next_step) {
-                    exec("service isc-dhcp-server restart", function(error, stdout, stderr) {
+                    exec("dhcpd /etc/dhcpd.conf", function(error, stdout, stderr) {
                         //console.log(stdout);
                         if (!error) console.log("... dhcp server restarted!");
                         next_step();
@@ -228,7 +223,7 @@ module.exports = function() {
                 },
 
                 function restart_hostapd_service(next_step) {
-                    exec("service hostapd restart", function(error, stdout, stderr) {
+                    exec("hostapd /etc/hostapd.conf", function(error, stdout, stderr) {
                         //console.log(stdout);
                         if (!error) console.log("... hostapd restarted!");
                         next_step();
