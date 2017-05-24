@@ -206,7 +206,7 @@ module.exports = function() {
                 function update_hostapd_default(next_step) {
                     write_template_to_file(
                         "./assets/etc/default/hostapd.template",
-                        "/etc/default/hostapd",
+                        "/etc/hostapd",
                         context, next_step);
                 },
 
@@ -215,7 +215,7 @@ module.exports = function() {
                 },
 
                 function restart_dhcp_service(next_step) {
-                    exec("dhcpd /etc/dhcpd.conf", function(error, stdout, stderr) {
+                    exec("dhcpd", function(error, stdout, stderr) {
                         //console.log(stdout);
                         if (!error) console.log("... dhcp server restarted!");
                         next_step();
@@ -223,7 +223,7 @@ module.exports = function() {
                 },
 
                 function restart_hostapd_service(next_step) {
-                    exec("hostapd /etc/hostapd.conf", function(error, stdout, stderr) {
+                    exec("hostapd -B /etc/hostapd.conf", function(error, stdout, stderr) {
                         //console.log(stdout);
                         if (!error) console.log("... hostapd restarted!");
                         next_step();
