@@ -105,55 +105,31 @@ module.exports = function() {
         ], callback);
     },
 
+    //TODO: don't just check config, but check actual interface status
     // Wifi related functions
-    _is_wifi_enabled_sync = function(info) {
-        // If we are not an AP, and we have a valid
-        // inet_addr - wifi is enabled!
-        if (null        == _is_ap_enabled_sync(info) &&
-            "<unknown>" != info["inet_addr"]         &&
-            "<unknown>" == info["unassociated"] ) {
-            return info["inet_addr"];
-        }
-        return null;
-    },
-
     _is_wifi_enabled = function(callback) {
-        _get_wifi_info(function(error, info) {
-            if (error) return callback(error, null);
-            return callback(null, _is_wifi_enabled_sync(info));
-        });
+	if !config.ap_mode return callback(error, null);
+        else return callback(null, _get);
     },
 
     // Access Point related functions
-    _is_ap_enabled_sync = function(info) {
-        // If the hw_addr matches the ap_addr
-        // and the ap_ssid matches "rpi-config-ap"
-        // then we are in AP mode
-        var is_ap  =
-            info["hw_addr"].toLowerCase() == info["ap_addr"].toLowerCase() &&
-            info["ap_ssid"] == config.access_point.ssid;
-        return (is_ap) ? info["hw_addr"].toLowerCase() : null;
-    },
-
     _is_ap_enabled = function(callback) {
-        _get_wifi_info(function(error, info) {
-            if (error) return callback(error, null);
-            return callback(null, _is_ap_enabled_sync(info));
-        });
+	if config.ap_mode return callback(error, null);
+        else return callback(null, true);
     },
 
     // Enables the accesspoint w/ bcast_ssid. This assumes that both
     // isc-dhcp-server and hostapd are installed using:
     // $sudo npm run-script provision
     _enable_ap_mode = function(bcast_ssid, callback) {
-        _is_ap_enabled(function(error, result_addr) {
+        _is_ap_enabled(function(error, ap_mode) {
             if (error) {
                 console.log("ERROR: " + error);
                 return callback(error);
             }
 
-            if (result_addr && !config.access_point.force_reconfigure) {
-                console.log("\nAccess point is enabled with ADDR: " + result_addr);
+            if (ap_mode && !config.access_point.force_reconfigure) {
+                console.log("\nAccess point is enabled");
                 return callback(null);
             } else if (config.access_point.force_reconfigure) {
                 console.log("\nForce reconfigure enabled - reset AP");
@@ -199,14 +175,14 @@ module.exports = function() {
                 function update_hostapd_conf(next_step) {
                     write_template_to_file(
                         "./assets/etc/hostapd/hostapd.conf.template",
-                        "/etc/hostapd/hostapd.conf",
+                        "/etc/hostapd.conf",
                         context, next_step);
                 },
 
                 function update_hostapd_default(next_step) {
                     write_template_to_file(
                         "./assets/etc/default/hostapd.template",
-                        "/etc/hostapd",
+                        "/etc/default/hostapd.conf",
                         context, next_step);
                 },
 

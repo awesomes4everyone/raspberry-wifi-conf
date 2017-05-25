@@ -2,6 +2,8 @@
     "wifi_interface": "wlan0",
     "wifi_driver_type": "nl80211",
 
+    "ap_mode": true,
+
     "access_point": {
         "force_reconfigure": true,
         "wifi_interface":    "wlan0",
