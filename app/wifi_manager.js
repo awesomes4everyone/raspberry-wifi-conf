@@ -167,7 +167,7 @@ module.exports = function() {
                 function update_dhcp_interface(next_step) {
                     write_template_to_file(
                         "./assets/etc/default/isc-dhcp-server.template",
-                        "/etc/isc-dhcp-server",
+                        "/etc/default/isc-dhcp-server",
                         context, next_step);
                 },
 
@@ -235,7 +235,7 @@ module.exports = function() {
 
                 // Stop the DHCP server...
                 function restart_dhcp_service(next_step) {
-                    exec("service isc-dhcp-server stop", function(error, stdout, stderr) {
+                    exec("killall dhcpd", function(error, stdout, stderr) {
                         //console.log(stdout);
                         if (!error) console.log("... dhcp server stopped!");
                         next_step();
