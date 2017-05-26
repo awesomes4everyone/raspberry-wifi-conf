@@ -108,13 +108,13 @@ module.exports = function() {
     //TODO: don't just check config, but check actual interface status
     // Wifi related functions
     _is_wifi_enabled = function(callback) {
-	if !config.ap_mode return callback(error, null);
-        else return callback(null, _get);
+	if (config.ap_mode) return callback(null, false);
+        else return callback(null, true);
     },
 
     // Access Point related functions
     _is_ap_enabled = function(callback) {
-	if config.ap_mode return callback(error, null);
+	if (!config.ap_mode) return callback(null, false);
         else return callback(null, true);
     },
 
@@ -167,7 +167,7 @@ module.exports = function() {
                 function update_dhcp_interface(next_step) {
                     write_template_to_file(
                         "./assets/etc/default/isc-dhcp-server.template",
-                        "/etc/default/isc-dhcp-server",
+                        "/etc/isc-dhcp-server",
                         context, next_step);
                 },
 
@@ -256,10 +256,10 @@ module.exports = function() {
         reboot_wireless_network: _reboot_wireless_network,
 
         is_wifi_enabled:         _is_wifi_enabled,
-        is_wifi_enabled_sync:    _is_wifi_enabled_sync,
+        //is_wifi_enabled_sync:    _is_wifi_enabled_sync,
 
         is_ap_enabled:           _is_ap_enabled,
-        is_ap_enabled_sync:      _is_ap_enabled_sync,
+        //is_ap_enabled_sync:      _is_ap_enabled_sync,
 
         enable_ap_mode:          _enable_ap_mode,
         enable_wifi_mode:        _enable_wifi_mode,
