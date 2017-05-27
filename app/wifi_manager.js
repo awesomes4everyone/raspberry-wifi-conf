@@ -233,6 +233,13 @@ module.exports = function() {
                         connection_info, next_step);
                 },
 
+		function update_wpa_supplicant(next_step){
+			write_template_to_file(
+				"./assets/etc/wpa_supplicant.template",
+				"/etc/wpa_supplicant.conf",
+				connection_info, next_step);
+		},
+
                 // Stop the DHCP server...
                 function restart_dhcp_service(next_step) {
                     exec("killall dhcpd", function(error, stdout, stderr) {
